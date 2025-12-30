@@ -3,7 +3,7 @@ import logo from '../assets/SinergiProLogo.png';
 
 const Hero = () => {
   const whatsappNumber = "6282170171151"; 
-  const googleFormLink = "https://forms.gle/https://docs.google.com/forms/d/e/1FAIpQLSf_tB7a3PeI7bjalC7wrb6YWRKZpBxUhMTX4LWP29To8tvOGg/viewform?usp=publish-editor"; 
+  const googleFormLink = "https://forms.gle/F7Fh4XQ98AsFZ98n8"; 
 
   return (
     <div className="min-h-screen bg-white">

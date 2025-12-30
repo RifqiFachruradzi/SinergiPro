@@ -1,4 +1,5 @@
 import React from 'react';
+import logo from '../assets/SinergiProLogo.png'; 
 
 const Hero = () => {
   const whatsappNumber = "6282170171151"; 
@@ -13,9 +14,9 @@ const Hero = () => {
           {/* BAGIAN LOGO & NAMA (DIRAPIHKAN) */}
           <div className="flex items-center gap-3">
             <img 
-              src="src/assets/SinergiProLogo.png" 
-              className="h-10 w-auto object-contain" 
-              alt="Logo SinergiPro" 
+              src={logo} // 2. Gunakan variabel, bukan string path
+              className="h-10 w-auto object-contain"
+              alt="Logo SinergiPro"
             />
             <span className="text-2xl font-bold text-blue-500">
               Sinergi<span className="text-slate-900">Pro</span>

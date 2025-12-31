@@ -9,8 +9,8 @@ function App() {
     <div className="App">
       <Hero />
       <Services /> 
-      <About />
       <DescComp />
+      <About />
       <footer className="py-10 text-center border-t border-slate-100 text-slate-400 text-sm">
         <p>&copy; 2025 SinergiPro. All rights reserved.</p>
       </footer>

@@ -33,15 +33,15 @@ const AboutUs = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-white">
+    <section id="about" className="py-20 bg-blue-600">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header Bagian */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
             Kenapa Memilih Kami?
           </h2>
           {/* <p className="text-slate-600 font-medium">Keunggulan Sistem SinergiPro</p> */}
-          <div className="w-16 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
+          {/* <div className="w-16 h-1 bg-white mx-auto mt-4 rounded-full"></div> */}
         </div>
 
         {/* Grid Kartu Keunggulan */}
@@ -49,7 +49,7 @@ const AboutUs = () => {
           {points.map((point, index) => (
             <div 
               key={index} 
-              className="group p-8 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-2xl hover:shadow-blue-100 transition-all duration-300"
+              className="group p-8 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
             >
               <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 {point.icon}

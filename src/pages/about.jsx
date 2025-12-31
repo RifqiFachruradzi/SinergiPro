@@ -1,6 +1,6 @@
 import React from 'react';
 
-const About = () => {
+const AboutUs = () => {
   const points = [
     {
       title: "On-Demand System",
@@ -68,4 +68,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default AboutUs;

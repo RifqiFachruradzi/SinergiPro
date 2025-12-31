@@ -37,7 +37,7 @@ const Hero = () => {
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1 text-center lg:text-left">
             <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-tight mb-6 item container text-center mx-auto py-4 px-6 md:px-20 lg:px-32">
-              Solusi Operasional <span className="text-blue-500"><br />Cepat & Terintegrasi</span>
+              SOLUSI OPERASIONAL <span className="text-blue-500"><br />BERBASIS KEMITRAAN MURNI</span>
             </h1>
             <p className="item container text-center text-lg text-slate-600 mb-8">
               Menghubungkan bisnis Anda dengan mitra profesional yang siap sedia kapan pun dibutuhkan. Efisien, transparan, dan terpercaya.

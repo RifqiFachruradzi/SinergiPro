@@ -33,7 +33,7 @@ const AboutUs = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-blue-600">
+    <section id="about" className="py-20 bg-blue-500">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header Bagian */}
         <div className="text-center mb-16">

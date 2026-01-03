@@ -1,20 +1,34 @@
 import React from 'react';
-import Hero from './pages/hero'; 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+// Import komponen/halaman Anda
+import Hero from './pages/hero';
 import Services from './pages/services';
-import About from './pages/about';
+import JoinMitra from './pages/JoinMitra';
+import RegistrationForm from './pages/RegistrationForm';
 import DescComp from './pages/DescComp';
 
 function App() {
   return (
-    <div className="App">
-      <Hero />
-      <Services /> 
-      <DescComp />
-      <About />
-      <footer className="py-10 text-center border-t border-slate-100 text-slate-400 text-sm">
-        <p>&copy; 2025 SinergiPro. All rights reserved.</p>
-      </footer>
-    </div>
+    <Router>
+      <div className="flex flex-col">
+        <Routes>
+          {/* Halaman Utama (Landing Page) */}
+          <Route path="/" element={
+            <>
+              <Hero />
+              <Services />
+              <JoinMitra />
+              <DescComp />
+              {/* Footer bisa diletakkan di sini */}
+            </>
+          } />
+
+          {/* Halaman Baru Khusus Pendaftaran */}
+          <Route path="/daftar-mitra" element={<RegistrationForm />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

@@ -16,7 +16,6 @@ const AboutUs = () => {
       desc: "Semua tenaga lapangan adalah mitra mandiri yang telah melalui proses seleksi ketat untuk menjamin kualitas.",
       icon: (
         <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04 Pelajari seleksi ketat kami." />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       )
@@ -33,15 +32,14 @@ const AboutUs = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-blue-500">
+    <section id="keunggulan" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header Bagian */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
             Kenapa Memilih Kami?
           </h2>
-          {/* <p className="text-slate-600 font-medium">Keunggulan Sistem SinergiPro</p> */}
-          {/* <div className="w-16 h-1 bg-white mx-auto mt-4 rounded-full"></div> */}
+          <p className="text-slate-600 font-medium">Keunggulan Sistem SinergiPro</p>
         </div>
 
         {/* Grid Kartu Keunggulan */}

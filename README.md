@@ -1,16 +1,23 @@
-# React + Vite
+# SinergiPro
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Landing page dan formulir digital SinergiPro — platform solusi operasional berbasis **kemitraan murni** (cleaning service, driver, kurir/COD, sorter & helper gudang, operator forklift).
 
-Currently, two official plugins are available:
+## Fitur
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Landing page**: Hero, Layanan, Keunggulan, Cara Kerja (klien & mitra), Tentang Kami, FAQ, dan footer.
+- **Pesan Tenaga Kerja** (`/#pesan`): klien mengisi kebutuhan (layanan, jumlah, lokasi, tanggal, durasi) dan permintaan otomatis terkirim ke admin via WhatsApp.
+- **Pendaftaran Mitra** (`/daftar-mitra`): formulir dengan swafoto kamera (fallback unggah foto), upload SIM untuk driver/kurir, lalu data dikirim ke admin via WhatsApp.
+- Navbar responsif (menu mobile) dan tombol WhatsApp melayang.
 
-## React Compiler
+## Konfigurasi
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Nomor WhatsApp admin, daftar bidang keahlian, dan wilayah layanan diatur di `src/config.js`.
 
-## Expanding the ESLint configuration
+## Menjalankan
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev      # mode pengembangan
+npm run build    # build produksi ke folder dist/
+npm run lint
+```

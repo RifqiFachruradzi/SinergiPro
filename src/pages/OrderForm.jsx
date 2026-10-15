@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
 import { AREAS, SKILLS, waLink } from '../config';
+import { IconCheck } from '../components/Icons';
+
+const inputClass =
+  'w-full px-3.5 py-[13px] border-[1.5px] border-line rounded-[10px] bg-white text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition';
+
+const Field = ({ label, htmlFor, children }) => (
+  <div className="flex flex-col gap-2">
+    <label htmlFor={htmlFor} className="text-sm font-semibold text-body">{label}</label>
+    {children}
+  </div>
+);
 
 const initialForm = {
   perusahaan: '',
@@ -43,92 +54,80 @@ const OrderForm = () => {
     window.open(waLink(message), '_blank', 'noopener,noreferrer');
   };
 
-  const inputClass =
-    'w-full px-4 py-3 bg-slate-100 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all';
-  const labelClass = 'block text-sm font-bold text-black mb-2 tracking-wide';
-
   return (
-    <section id="pesan" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
-        <div className="lg:col-span-2">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Pesan Tenaga Kerja</h2>
-          <p className="text-slate-600 leading-relaxed mb-6">
-            Butuh tenaga kebersihan, driver, kurir, atau helper gudang? Isi formulir ini dan permintaan Anda
-            akan langsung terkirim ke tim SinergiPro melalui WhatsApp.
-          </p>
-          <ul className="space-y-3 text-slate-700">
-            {['Respons cepat via WhatsApp', 'Tanpa biaya tetap — bayar sesuai hasil kerja', 'Mitra terverifikasi & sesuai domisili'].map((t) => (
-              <li key={t} className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center">✓</span>
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="lg:col-span-3 bg-white rounded-2xl shadow-xl border border-slate-200 p-8 grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          <div>
-            <label className={labelClass} htmlFor="perusahaan">NAMA PERUSAHAAN / USAHA *</label>
-            <input id="perusahaan" required name="perusahaan" value={form.perusahaan} onChange={handleChange} className={inputClass} placeholder="PT / Toko / Perorangan" />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="pic">NAMA PIC *</label>
-            <input id="pic" required name="pic" value={form.pic} onChange={handleChange} className={inputClass} placeholder="Nama penanggung jawab" />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="order-wa">NOMOR WHATSAPP *</label>
-            <input id="order-wa" required type="tel" inputMode="numeric" pattern="[0-9+]{10,15}" name="whatsapp" value={form.whatsapp} onChange={handleChange} className={inputClass} placeholder="0821xxxx" />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="layanan">JENIS LAYANAN *</label>
-            <select id="layanan" required name="layanan" value={form.layanan} onChange={handleChange} className={inputClass}>
-              <option value="">Pilih Layanan...</option>
-              {SKILLS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="jumlah">JUMLAH TENAGA *</label>
-            <input id="jumlah" required type="number" min="1" name="jumlah" value={form.jumlah} onChange={handleChange} className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="lokasi">LOKASI KERJA *</label>
-            <select id="lokasi" required name="lokasi" value={form.lokasi} onChange={handleChange} className={inputClass}>
-              <option value="">Pilih Wilayah...</option>
-              {AREAS.map((a) => (
-                <option key={a} value={a}>{a}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="tanggal">TANGGAL MULAI *</label>
-            <input id="tanggal" required type="date" name="tanggal" value={form.tanggal} onChange={handleChange} className={inputClass} />
-          </div>
-          <div>
-            <label className={labelClass} htmlFor="durasi">DURASI / SISTEM *</label>
-            <select id="durasi" required name="durasi" value={form.durasi} onChange={handleChange} className={inputClass}>
-              <option>Harian</option>
-              <option>Mingguan</option>
-              <option>Bulanan</option>
-              <option>Borongan (per proyek)</option>
-            </select>
-          </div>
-          <div className="md:col-span-2">
-            <label className={labelClass} htmlFor="catatan">CATATAN TAMBAHAN</label>
-            <textarea id="catatan" name="catatan" rows="3" value={form.catatan} onChange={handleChange} className={inputClass} placeholder="Detail pekerjaan, jam kerja, alamat lengkap, dll." />
-          </div>
-          <button
-            type="submit"
-            className="md:col-span-2 w-full py-4 font-black rounded-xl shadow-lg bg-blue-500 hover:bg-blue-600 text-white uppercase tracking-widest transition-all"
-          >
-            Kirim Permintaan via WhatsApp
-          </button>
-        </form>
+    <section id="pesan" className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-5 gap-12 items-start">
+      <div className="lg:col-span-2 flex flex-col gap-[18px]">
+        <h2 className="text-3xl md:text-[40px] leading-[1.1] font-extrabold tracking-[-0.02em] text-navy">
+          Ajukan kebutuhan tenaga
+        </h2>
+        <p className="text-base leading-relaxed text-muted">
+          Isi formulir ini, permintaan langsung masuk ke tim kami via WhatsApp. Kami balas dengan penawaran dan jadwal mitra.
+        </p>
+        <ul className="flex flex-col gap-3 text-[15px] text-body">
+          {['Tanpa kontrak karyawan', 'Mitra sesuai domisili lokasi kerja', 'Harian, mingguan, bulanan, atau borongan'].map((t) => (
+            <li key={t} className="flex gap-2.5 items-center">
+              <IconCheck className="w-5 h-5 text-[#1E8E5A]" />
+              {t}
+            </li>
+          ))}
+        </ul>
       </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="lg:col-span-3 bg-white border border-line rounded-3xl p-6 sm:p-8 grid sm:grid-cols-2 gap-[18px]"
+      >
+        <Field label="Nama perusahaan / usaha" htmlFor="perusahaan">
+          <input id="perusahaan" required name="perusahaan" value={form.perusahaan} onChange={handleChange} className={inputClass} placeholder="PT / Toko / Perorangan" />
+        </Field>
+        <Field label="Nama PIC" htmlFor="pic">
+          <input id="pic" required name="pic" value={form.pic} onChange={handleChange} className={inputClass} placeholder="Nama penanggung jawab" />
+        </Field>
+        <Field label="Nomor WhatsApp" htmlFor="order-wa">
+          <input id="order-wa" required type="tel" inputMode="numeric" pattern="[0-9+]{10,15}" name="whatsapp" value={form.whatsapp} onChange={handleChange} className={inputClass} placeholder="0821xxxx" />
+        </Field>
+        <Field label="Jenis layanan" htmlFor="layanan">
+          <select id="layanan" required name="layanan" value={form.layanan} onChange={handleChange} className={inputClass}>
+            <option value="">Pilih layanan...</option>
+            {SKILLS.map((s) => (
+              <option key={s.value} value={s.value}>{s.label}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Jumlah tenaga" htmlFor="jumlah">
+          <input id="jumlah" required type="number" min="1" name="jumlah" value={form.jumlah} onChange={handleChange} className={inputClass} />
+        </Field>
+        <Field label="Lokasi kerja" htmlFor="lokasi">
+          <select id="lokasi" required name="lokasi" value={form.lokasi} onChange={handleChange} className={inputClass}>
+            <option value="">Pilih wilayah...</option>
+            {AREAS.map((a) => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Tanggal mulai" htmlFor="tanggal">
+          <input id="tanggal" required type="date" name="tanggal" value={form.tanggal} onChange={handleChange} className={inputClass} />
+        </Field>
+        <Field label="Durasi / sistem" htmlFor="durasi">
+          <select id="durasi" required name="durasi" value={form.durasi} onChange={handleChange} className={inputClass}>
+            <option>Harian</option>
+            <option>Mingguan</option>
+            <option>Bulanan</option>
+            <option>Borongan (per proyek)</option>
+          </select>
+        </Field>
+        <div className="sm:col-span-2">
+          <Field label="Catatan tambahan (opsional)" htmlFor="catatan">
+            <textarea id="catatan" name="catatan" rows="3" value={form.catatan} onChange={handleChange} className={inputClass} placeholder="Detail pekerjaan, jam kerja, alamat lengkap, dll." />
+          </Field>
+        </div>
+        <button
+          type="submit"
+          className="sm:col-span-2 w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base transition-colors"
+        >
+          Kirim via WhatsApp
+        </button>
+      </form>
     </section>
   );
 };

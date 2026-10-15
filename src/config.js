@@ -4,6 +4,10 @@ export const BRAND_NAME = 'SinergiPro';
 // Nomor WhatsApp admin (format internasional tanpa tanda +)
 export const WHATSAPP_NUMBER = '6282170171151';
 
+// Foto hero (mis. foto asli mitra berseragam). Isi dengan import gambar atau URL;
+// jika null, hero menampilkan panel ilustrasi layanan.
+export const HERO_PHOTO = null;
+
 export const waLink = (message = '') =>
   `https://wa.me/${WHATSAPP_NUMBER}${message ? `?text=${encodeURIComponent(message)}` : ''}`;
 

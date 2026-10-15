@@ -1,74 +1,73 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/SinergiProLogo.png';
+import { IconClose, IconMenu } from './Icons';
 
 const links = [
-  { to: '/#home', label: 'Home' },
   { to: '/#layanan', label: 'Layanan' },
   { to: '/#cara-kerja', label: 'Cara Kerja' },
   { to: '/#pesan', label: 'Pesan Tenaga' },
-  { to: '/#joinmitra', label: 'Jadi Mitra' },
-  { to: '/#about', label: 'Tentang' },
+  { to: '/#tentang', label: 'Tentang' },
+  { to: '/#faq', label: 'FAQ' },
 ];
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
 
   return (
-    <header className="fixed w-full bg-white z-50 shadow-md">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-        <Link to="/#home" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <img src={logo} className="h-10 w-auto object-contain" alt="Logo SinergiPro" />
-          <span className="text-xl font-bold text-black tracking-tight">
-            Sinergi<span className="text-blue-500">Pro</span>
+    <header className="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-b border-line">
+      <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between gap-4">
+        <Link to="/#home" onClick={close} className="flex items-center gap-2.5 text-ink">
+          <img src={logo} alt="" className="w-9 h-9 object-contain" />
+          <span className="text-xl font-extrabold tracking-tight">
+            Sinergi<span className="text-brand">Pro</span>
           </span>
         </Link>
 
-        <nav className="hidden md:flex gap-6 font-medium items-center text-sm">
+        <nav aria-label="Navigasi utama" className="hidden lg:flex items-center gap-7 text-[15px] font-medium">
           {links.map((l) => (
-            <Link key={l.to} to={l.to} className="text-black hover:text-blue-500 transition">
+            <Link key={l.to} to={l.to} className="text-body hover:text-brand transition-colors">
               {l.label}
             </Link>
           ))}
-          <Link
-            to="/daftar-mitra"
-            className="bg-blue-500 text-white px-6 py-2 rounded font-bold hover:bg-blue-600 transition"
-          >
-            Daftar Mitra
-          </Link>
         </nav>
+
+        <div className="hidden lg:flex gap-2.5">
+          <Link to="/#pesan" className="px-[18px] py-3 rounded-[10px] border-[1.5px] border-navy text-navy font-bold text-sm hover:bg-navy hover:text-white transition-colors">
+            Pesan Tenaga
+          </Link>
+          <Link to="/daftar-mitra" className="px-[18px] py-3 rounded-[10px] bg-brand text-white font-bold text-sm hover:bg-brand-dark transition-colors">
+            Daftar Jadi Mitra
+          </Link>
+        </div>
 
         <button
           type="button"
-          className="md:hidden p-2 text-black"
-          aria-label="Buka menu"
+          className="lg:hidden w-11 h-11 flex items-center justify-center rounded-xl text-navy"
+          aria-label={open ? 'Tutup menu' : 'Buka menu'}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {open ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
+          {open ? <IconClose className="w-7 h-7" /> : <IconMenu className="w-7 h-7" />}
         </button>
       </div>
 
       {open && (
-        <nav className="md:hidden border-t border-slate-100 bg-white px-6 py-4 flex flex-col gap-4 text-sm font-medium">
+        <nav aria-label="Navigasi mobile" className="lg:hidden border-t border-line bg-white px-6 py-4 flex flex-col gap-1 font-medium">
           {links.map((l) => (
-            <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="text-black hover:text-blue-500">
+            <Link key={l.to} to={l.to} onClick={close} className="py-3 text-body hover:text-brand">
               {l.label}
             </Link>
           ))}
-          <Link
-            to="/daftar-mitra"
-            onClick={() => setOpen(false)}
-            className="bg-blue-500 text-white px-6 py-2 rounded font-bold text-center hover:bg-blue-600"
-          >
-            Daftar Mitra
-          </Link>
+          <div className="grid grid-cols-2 gap-2.5 pt-3">
+            <Link to="/#pesan" onClick={close} className="py-3 rounded-[10px] border-[1.5px] border-navy text-navy font-bold text-sm text-center">
+              Pesan Tenaga
+            </Link>
+            <Link to="/daftar-mitra" onClick={close} className="py-3 rounded-[10px] bg-brand text-white font-bold text-sm text-center">
+              Daftar Jadi Mitra
+            </Link>
+          </div>
         </nav>
       )}
     </header>

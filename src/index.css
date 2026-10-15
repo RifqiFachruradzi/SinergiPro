@@ -10,3 +10,7 @@ html {
 section[id] {
   scroll-margin-top: 5rem;
 }
+
+body {
+  @apply bg-ground text-ink antialiased;
+}

@@ -1,40 +1,32 @@
 import React from 'react';
 
-const DescComp = () => {
-  return (
-    <section id="about" className="py-20 bg-blue-500 text-white">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
+const values = [
+  { title: 'Kemitraan murni', desc: 'Mitra adalah pekerja mandiri, bukan karyawan outsourcing.' },
+  { title: 'Fee-based & borongan', desc: 'Biaya mengikuti hasil kerja, operasional jadi lebih efisien.' },
+  { title: 'Kemandirian & hasil kerja', desc: 'Prinsip yang kami pegang di setiap penugasan.' },
+];
 
-          {/* Judul Bagian */}
-          <div className="lg:w-1/3">
-            <h2 className="text-4xl font-extrabold mb-4 leading-tight">
-              Tentang Kami
-            </h2>
-            <div className="w-64 h-1.5 bg-white rounded-full"></div>
+const DescComp = () => (
+  <section id="tentang" className="max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-5 gap-12">
+    <div className="lg:col-span-2">
+      <h2 className="text-3xl md:text-[40px] font-extrabold tracking-[-0.02em] text-navy">Tentang SinergiPro</h2>
+    </div>
+    <div className="lg:col-span-3 flex flex-col gap-6">
+      <p className="text-lg leading-relaxed text-body">
+        SinergiPro adalah platform penyedia solusi operasional berbasis kemitraan. Kami membangun ekosistem tenaga
+        lapangan yang terintegrasi dan profesional — mulai dari jasa handling borongan, layanan driver berbasis
+        pengiriman, kurir dan penanganan COD, hingga kebersihan gedung.
+      </p>
+      <div className="grid sm:grid-cols-3 gap-4">
+        {values.map((v) => (
+          <div key={v.title} className="bg-white border border-line rounded-[18px] p-5">
+            <h3 className="font-bold text-navy mb-1.5">{v.title}</h3>
+            <p className="text-sm leading-relaxed text-muted">{v.desc}</p>
           </div>
-
-          {/* Konten Teks */}
-          <div className="lg:w-2/3 space-y-6 text-lg leading-relaxed opacity-90">
-            <p>
-              <span className="font-bold text-white">SinergiPro</span> adalah platform penyedia solusi operasional berbasis <span className="underline decoration-white underline-offset-4">Kemitraan Murni (bukan outsourcing karyawan)</span>.
-            </p>
-
-            <p>
-              Solusi kami mencakup jasa logistik, handling, kurir, kebersihan, dan layanan penunjang bisnis lainnya. Dengan model <span className="font-bold">fee-based dan borongan</span>, bisnis Anda membayar sesuai hasil kerja sehingga operasional menjadi lebih efisien dan fleksibel.
-            </p>
-
-            <div className="p-6 bg-blue-600 rounded-2xl border border-blue-400/30 shadow-inner">
-              <p>
-                Fokus utama SinergiPro adalah membangun ekosistem kemitraan tenaga kerja yang terintegrasi dan profesional di semua sektor operasional, misalnya jasa handling borongan, layanan driver berbasis pengiriman, dan penanganan COD, yang semuanya dijalankan di bawah prinsip <span className="text-white font-bold uppercase tracking-wider">kemandirian dan hasil kerja</span>.
-              </p>
-            </div>
-          </div>
-
-        </div>
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default DescComp;

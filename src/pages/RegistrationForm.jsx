@@ -2,14 +2,12 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { AREAS, SKILLS, waLink } from '../config';
+import { IconCamera, IconCheck, IconChevronLeft, IconInfo } from '../components/Icons';
 
-const initialForm = {
-  nama: '',
-  whatsapp: '',
-  keahlian: '',
-  domisili: '',
-  setuju: false,
-};
+const STEPS = ['Data diri', 'Dokumen & wilayah', 'Konfirmasi'];
+
+const inputClass =
+  'w-full px-3.5 py-[13px] text-base border-[1.5px] border-line rounded-[10px] bg-white text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition';
 
 const readFileAsDataUrl = (file) =>
   new Promise((resolve, reject) => {
@@ -19,100 +17,122 @@ const readFileAsDataUrl = (file) =>
     reader.readAsDataURL(file);
   });
 
+const Chip = ({ active, onClick, children }) => (
+  <button
+    type="button"
+    aria-pressed={active}
+    onClick={onClick}
+    className={`min-h-[44px] px-3.5 rounded-full border-[1.5px] text-sm transition-colors ${
+      active ? 'border-brand bg-brand-tint text-brand-dark font-bold' : 'border-line bg-white text-body font-semibold hover:border-brand'
+    }`}
+  >
+    {children}
+  </button>
+);
+
 const RegistrationForm = () => {
-  const [formData, setFormData] = useState(initialForm);
-  const [capturedImage, setCapturedImage] = useState(null);
-  const [showCamera, setShowCamera] = useState(true);
+  const [step, setStep] = useState(0);
+  const [form, setForm] = useState({ nama: '', whatsapp: '', keahlian: '', domisili: '', setuju: false });
+  const [photo, setPhoto] = useState(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraError, setCameraError] = useState(false);
   const [simFile, setSimFile] = useState(null);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const webcamRef = useRef(null);
 
-  const needsSim = formData.keahlian === 'Driver' || formData.keahlian === 'Kurir';
+  const needsSim = form.keahlian === 'Driver' || form.keahlian === 'Kurir';
+  const keahlianLabel = SKILLS.find((s) => s.value === form.keahlian)?.label || '-';
+  const set = (name, value) => setForm((prev) => ({ ...prev, [name]: value }));
 
   const capture = useCallback(() => {
-    const imageSrc = webcamRef.current?.getScreenshot();
-    if (imageSrc) {
-      setCapturedImage(imageSrc);
-      setShowCamera(false);
+    const src = webcamRef.current?.getScreenshot();
+    if (src) {
+      setPhoto(src);
+      setCameraOpen(false);
     }
   }, []);
 
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setCapturedImage(await readFileAsDataUrl(file));
-    setShowCamera(false);
+    setPhoto(await readFileAsDataUrl(file));
+    setCameraOpen(false);
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  const validate = () => {
+    if (step === 0) {
+      if (!photo) return 'Harap ambil atau unggah swafoto terlebih dahulu.';
+      if (form.nama.trim().length < 3) return 'Isi nama lengkap sesuai KTP.';
+      if (!/^(\+?62|0)8[0-9]{8,12}$/.test(form.whatsapp)) return 'Nomor WhatsApp tidak valid. Contoh: 082112345678';
+      if (!form.keahlian) return 'Pilih salah satu bidang keahlian.';
+    }
+    if (step === 1) {
+      if (needsSim && !simFile) return 'Driver dan kurir wajib mengunggah foto SIM.';
+      if (!form.domisili) return 'Pilih wilayah domisili Anda.';
+    }
+    if (step === 2 && !form.setuju) return 'Centang persetujuan sebagai mitra mandiri.';
+    return '';
   };
 
-  const handleSubmit = (e) => {
+  const next = (e) => {
     e.preventDefault();
-    setError('');
-
-    if (!capturedImage) {
-      setError('Harap ambil foto swafoto terlebih dahulu.');
-      return;
-    }
-    if (!/^(\+?62|0)8[0-9]{8,12}$/.test(formData.whatsapp)) {
-      setError('Nomor WhatsApp tidak valid. Contoh: 082112345678');
+    const msg = validate();
+    setError(msg);
+    if (msg) return;
+    if (step < STEPS.length - 1) {
+      setStep(step + 1);
+      window.scrollTo({ top: 0 });
       return;
     }
 
-    const keahlian = SKILLS.find((s) => s.value === formData.keahlian)?.label || formData.keahlian;
     const message = [
       '*PENDAFTARAN MITRA - SinergiPro*',
       '',
-      `Nama Lengkap: ${formData.nama}`,
-      `No. WhatsApp: ${formData.whatsapp}`,
-      `Bidang Keahlian: ${keahlian}`,
-      `Domisili: ${formData.domisili}`,
+      `Nama Lengkap: ${form.nama}`,
+      `No. WhatsApp: ${form.whatsapp}`,
+      `Bidang Keahlian: ${keahlianLabel}`,
+      `Domisili: ${form.domisili}`,
       'Persetujuan Mitra Mandiri (No Work No Pay): YA',
       '',
       needsSim
         ? 'Foto swafoto dan foto SIM akan saya lampirkan pada chat ini.'
         : 'Foto swafoto akan saya lampirkan pada chat ini.',
     ].join('\n');
-
     window.open(waLink(message), '_blank', 'noopener,noreferrer');
     setSubmitted(true);
   };
 
-  const inputClass =
-    'w-full px-4 py-3 bg-slate-100 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all';
-  const labelClass = 'block text-sm font-bold text-black mb-2 tracking-wide';
+  const back = () => {
+    setError('');
+    setStep((s) => Math.max(0, s - 1));
+  };
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-100 pt-32 pb-12 px-4">
-        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8 text-center border border-slate-200">
-          <div className="w-16 h-16 mx-auto rounded-full bg-green-100 text-green-600 text-3xl flex items-center justify-center mb-4">✓</div>
-          <h2 className="text-2xl font-bold text-black mb-2">Data Pendaftaran Siap Dikirim</h2>
-          <p className="text-slate-600 mb-6">
-            Kirim pesan yang sudah terisi di WhatsApp, lalu lampirkan foto swafoto
-            {needsSim ? ' dan foto SIM' : ''} Anda. Tim SinergiPro akan memverifikasi dan menghubungi Anda.
+      <div className="min-h-screen bg-ground pt-28 pb-16 px-5">
+        <div className="max-w-lg mx-auto bg-white rounded-3xl border border-line p-8 text-center flex flex-col items-center gap-4">
+          <span className="w-16 h-16 rounded-full bg-[#E4F5EC] text-[#1E7A4F] flex items-center justify-center">
+            <IconCheck className="w-8 h-8" />
+          </span>
+          <h1 className="text-2xl font-extrabold text-navy">Tinggal satu langkah lagi</h1>
+          <p className="text-muted leading-relaxed">
+            Kirim pesan yang sudah terisi di WhatsApp, lalu lampirkan swafoto{needsSim ? ' dan foto SIM' : ''} Anda.
+            Tim SinergiPro akan memverifikasi dan menghubungi Anda.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-2">
             <a
-              href={capturedImage}
-              download={`swafoto-${formData.nama.replace(/\s+/g, '-').toLowerCase() || 'mitra'}.jpg`}
-              className="px-6 py-3 bg-black text-white font-bold rounded-lg hover:bg-slate-800"
+              href={photo}
+              download={`swafoto-${form.nama.trim().replace(/\s+/g, '-').toLowerCase() || 'mitra'}.jpg`}
+              className="px-6 py-3.5 rounded-xl bg-navy text-white font-bold"
             >
-              Unduh Foto Swafoto
+              Unduh swafoto
             </a>
-            <Link to="/" className="px-6 py-3 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600">
-              Kembali ke Beranda
+            <Link to="/" className="px-6 py-3.5 rounded-xl border-[1.5px] border-line text-navy font-bold">
+              Kembali ke beranda
             </Link>
           </div>
-          <button type="button" onClick={() => setSubmitted(false)} className="mt-6 text-sm text-blue-500 underline">
+          <button type="button" onClick={() => setSubmitted(false)} className="text-sm text-brand underline min-h-[44px]">
             WhatsApp tidak terbuka? Coba kirim ulang
           </button>
         </div>
@@ -121,146 +141,172 @@ const RegistrationForm = () => {
   }
 
   return (
-    <div id="registrationform" className="min-h-screen bg-slate-100 pt-32 pb-12 px-4">
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-
-        <div className="bg-white p-8 text-center">
-          <h2 className="text-3xl font-bold text-black">Formulir Kemitraan</h2>
-          <p className="text-blue-500 font-medium mt-2 tracking-widest uppercase text-sm">SinergiPro Mandiri</p>
+    <div className="min-h-screen bg-ground pt-20">
+      <form onSubmit={next} noValidate className="max-w-lg mx-auto min-h-[calc(100vh-5rem)] flex flex-col bg-ground">
+        {/* Header langkah */}
+        <div className="bg-white border-b border-line px-5 py-4 flex items-center gap-3">
+          {step > 0 ? (
+            <button type="button" onClick={back} aria-label="Langkah sebelumnya" className="w-11 h-11 rounded-xl flex items-center justify-center text-navy">
+              <IconChevronLeft className="w-[22px] h-[22px]" />
+            </button>
+          ) : (
+            <Link to="/" aria-label="Kembali ke beranda" className="w-11 h-11 rounded-xl flex items-center justify-center text-navy">
+              <IconChevronLeft className="w-[22px] h-[22px]" />
+            </Link>
+          )}
+          <div className="flex flex-col">
+            <h1 className="text-[17px] font-extrabold text-navy">Daftar Jadi Mitra</h1>
+            <span className="text-[13px] text-muted">Langkah {step + 1} dari {STEPS.length} · {STEPS[step]}</span>
+          </div>
+        </div>
+        <div className="px-5 pt-4 grid grid-cols-3 gap-1.5" aria-hidden="true">
+          {STEPS.map((s, i) => (
+            <span key={s} className={`h-1.5 rounded-full ${i <= step ? 'bg-brand' : 'bg-line'}`} />
+          ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-
-          {/* Input Nama */}
-          <div>
-            <label className={labelClass} htmlFor="nama">NAMA LENGKAP (SESUAI KTP) *</label>
-            <input
-              id="nama"
-              required
-              type="text"
-              name="nama"
-              value={formData.nama}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="Contoh: Budi Santoso"
-            />
-          </div>
-
-          {/* Fitur Kamera */}
-          <div>
-            <label className="block text-sm font-bold text-black mb-2 italic tracking-wide">FOTO SWAFOTO *</label>
-            <div className="relative rounded-xl overflow-hidden bg-black aspect-video flex items-center justify-center border-4 border-slate-100">
-              {capturedImage && !showCamera ? (
-                <div className="relative w-full h-full">
-                  <img src={capturedImage} alt="Swafoto" className="w-full h-full object-cover" />
-                  <button type="button" onClick={() => setShowCamera(true)} className="absolute top-2 right-2 bg-black/50 text-white px-3 py-2 rounded-full text-xs">Ulangi Foto</button>
+        <div className="flex-1 px-5 py-5 flex flex-col gap-[18px]">
+          {step === 0 && (
+            <>
+              {/* Swafoto */}
+              <div className="bg-white border border-line rounded-[18px] p-4 flex flex-col gap-4">
+                <div className="flex gap-4 items-center">
+                  <div className="w-[84px] h-[84px] flex-shrink-0 rounded-full overflow-hidden bg-brand-tint border-2 border-dashed border-[#8DB6E3] flex items-center justify-center">
+                    {photo ? <img src={photo} alt="Swafoto Anda" className="w-full h-full object-cover" /> : <IconCamera className="w-[30px] h-[30px] text-brand" />}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[15px] font-bold text-navy">Swafoto wajah</span>
+                    <span className="text-[13px] leading-snug text-muted">Wajah jelas, tanpa masker atau kacamata hitam.</span>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <button
+                        type="button"
+                        onClick={() => { setCameraError(false); setCameraOpen((v) => !v); }}
+                        className="min-h-[44px] px-4 rounded-[10px] bg-navy text-white text-sm font-bold"
+                      >
+                        {cameraOpen ? 'Tutup kamera' : photo ? 'Ulangi foto' : 'Buka kamera'}
+                      </button>
+                      <label className="min-h-[44px] px-2 flex items-center text-sm text-brand underline cursor-pointer">
+                        Unggah
+                        <input type="file" accept="image/*" capture="user" onChange={handlePhotoUpload} className="sr-only" />
+                      </label>
+                    </div>
+                  </div>
                 </div>
-              ) : cameraError ? (
-                <p className="text-white text-sm px-6 text-center">
-                  Kamera tidak dapat diakses. Silakan unggah foto swafoto di bawah.
-                </p>
-              ) : (
-                <>
-                  <Webcam
-                    audio={false}
-                    ref={webcamRef}
-                    mirrored
-                    screenshotFormat="image/jpeg"
-                    videoConstraints={{ facingMode: 'user' }}
-                    onUserMediaError={() => setCameraError(true)}
-                    className="w-full h-full object-cover"
-                  />
-                  <button type="button" onClick={capture} className="absolute bottom-4 bg-blue-500 text-white px-6 py-2 rounded-full font-bold">Ambil Foto</button>
-                </>
+                {cameraOpen && (
+                  <div className="relative rounded-xl overflow-hidden bg-black aspect-[3/4] flex items-center justify-center">
+                    {cameraError ? (
+                      <p className="text-white text-sm px-6 text-center">Kamera tidak dapat diakses. Gunakan tombol Unggah.</p>
+                    ) : (
+                      <>
+                        <Webcam
+                          audio={false}
+                          ref={webcamRef}
+                          mirrored
+                          screenshotFormat="image/jpeg"
+                          videoConstraints={{ facingMode: 'user' }}
+                          onUserMediaError={() => setCameraError(true)}
+                          className="w-full h-full object-cover"
+                        />
+                        <button type="button" onClick={capture} className="absolute bottom-4 min-h-[44px] bg-brand text-white px-6 rounded-full font-bold">
+                          Ambil foto
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="nama" className="text-sm font-semibold text-body">Nama lengkap (sesuai KTP)</label>
+                <input id="nama" type="text" autoComplete="name" value={form.nama} onChange={(e) => set('nama', e.target.value)} className={inputClass} placeholder="Contoh: Budi Santoso" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="whatsapp" className="text-sm font-semibold text-body">Nomor WhatsApp</label>
+                <input id="whatsapp" type="tel" inputMode="numeric" autoComplete="tel" value={form.whatsapp} onChange={(e) => set('whatsapp', e.target.value.trim())} className={inputClass} placeholder="0821xxxx" />
+                <span className="text-xs text-muted">Pendaftaran dikirim lewat WhatsApp dari nomor ini sebagai verifikasi.</span>
+              </div>
+              <fieldset className="flex flex-col gap-2.5">
+                <legend className="text-sm font-semibold text-body mb-2.5">Bidang keahlian</legend>
+                <div className="flex flex-wrap gap-2">
+                  {SKILLS.map((s) => (
+                    <Chip key={s.value} active={form.keahlian === s.value} onClick={() => set('keahlian', s.value)}>
+                      {s.label}
+                    </Chip>
+                  ))}
+                </div>
+              </fieldset>
+              {needsSim && (
+                <div className="flex gap-2.5 items-start px-3.5 py-3 rounded-xl bg-[#FFF6E5] text-[#6B4A0E] text-[13px] leading-snug">
+                  <IconInfo className="w-[18px] h-[18px] flex-shrink-0 mt-px" />
+                  {keahlianLabel} wajib unggah foto SIM aktif di langkah 2.
+                </div>
               )}
-            </div>
-            <label className="mt-2 inline-block text-xs text-blue-500 underline cursor-pointer">
-              Atau unggah foto dari perangkat
-              <input type="file" accept="image/*" capture="user" onChange={handlePhotoUpload} className="hidden" />
-            </label>
-          </div>
-
-          {/* Nomor Whatsapp */}
-          <div>
-            <label className={labelClass} htmlFor="whatsapp">NOMOR WHATSAPP AKTIF *</label>
-            <input
-              id="whatsapp"
-              required
-              type="tel"
-              inputMode="numeric"
-              name="whatsapp"
-              value={formData.whatsapp}
-              onChange={handleChange}
-              className={inputClass}
-              placeholder="0821xxxx"
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              Pendaftaran dikirim melalui WhatsApp dari nomor ini sebagai verifikasi.
-            </p>
-          </div>
-
-          {/* Bidang Keahlian */}
-          <div>
-            <label className={labelClass} htmlFor="keahlian">BIDANG KEAHLIAN YANG DIPILIH *</label>
-            <select id="keahlian" required name="keahlian" value={formData.keahlian} onChange={handleChange} className={inputClass}>
-              <option value="">Pilih Bidang...</option>
-              {SKILLS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Logika SIM */}
-          {needsSim && (
-            <div className="p-4 bg-blue-50 border-l-4 border-blue-500">
-              <label className="block text-sm font-bold text-blue-800 mb-2" htmlFor="sim">UPLOAD FOTO SIM (WAJIB) *</label>
-              <input
-                id="sim"
-                required
-                type="file"
-                accept="image/*"
-                onChange={(e) => setSimFile(e.target.files?.[0] || null)}
-                className="w-full text-sm text-slate-500 file:bg-blue-500 file:text-white file:rounded-full file:border-0 file:px-4 file:py-2"
-              />
-              {simFile && <p className="mt-2 text-xs text-blue-700">File dipilih: {simFile.name} — lampirkan juga di chat WhatsApp.</p>}
-            </div>
+            </>
           )}
 
-          {/* Domisili */}
-          <div>
-            <label className={labelClass} htmlFor="domisili">DOMISILI (WILAYAH TUGAS) *</label>
-            <select id="domisili" required name="domisili" value={formData.domisili} onChange={handleChange} className={inputClass}>
-              <option value="">Pilih Wilayah...</option>
-              {AREAS.map((a) => (
-                <option key={a} value={a}>{a}</option>
-              ))}
-            </select>
-          </div>
+          {step === 1 && (
+            <>
+              {needsSim && (
+                <div className="bg-white border border-line rounded-[18px] p-4 flex flex-col gap-2">
+                  <label htmlFor="sim" className="text-sm font-semibold text-body">Foto SIM aktif</label>
+                  <input
+                    id="sim"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setSimFile(e.target.files?.[0] || null)}
+                    className="text-sm text-muted file:mr-3 file:min-h-[44px] file:px-4 file:rounded-[10px] file:border-0 file:bg-navy file:text-white file:font-bold"
+                  />
+                  {simFile && <span className="text-xs text-brand-dark">Dipilih: {simFile.name} — lampirkan juga di chat WhatsApp.</span>}
+                </div>
+              )}
+              <fieldset className="flex flex-col gap-2.5">
+                <legend className="text-sm font-semibold text-body mb-2.5">Domisili (wilayah tugas)</legend>
+                <div className="flex flex-wrap gap-2">
+                  {AREAS.map((a) => (
+                    <Chip key={a} active={form.domisili === a} onClick={() => set('domisili', a)}>
+                      {a}
+                    </Chip>
+                  ))}
+                </div>
+              </fieldset>
+            </>
+          )}
 
-          {/* Persetujuan */}
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 mt-8">
-            <div className="flex items-start gap-3">
-              <input id="setuju" required type="checkbox" name="setuju" checked={formData.setuju} onChange={handleChange} className="mt-1 w-5 h-5 text-blue-500 rounded" />
-              <label htmlFor="setuju" className="text-xs text-slate-600 leading-relaxed uppercase">
-                SAYA MENGERTI BAHWA PENDAFTARAN INI ADALAH SEBAGAI <span className="font-bold text-black">MITRA MANDIRI</span>. SAYA BERSEDIA BEKERJA DENGAN SISTEM "NO WORK NO PAY" DAN BERSEDIA MENGIKUTI STANDAR OPERASIONAL PERUSAHAAN. <br />
-                <span className="font-bold text-blue-500 italic mt-1 block">YA, SAYA SETUJU DAN MEMAHAMI</span>
+          {step === 2 && (
+            <>
+              <div className="bg-white border border-line rounded-[18px] p-4 flex gap-4 items-center">
+                <img src={photo} alt="Swafoto Anda" className="w-16 h-16 rounded-full object-cover" />
+                <dl className="text-sm grid grid-cols-[auto,1fr] gap-x-3 gap-y-1">
+                  <dt className="text-muted">Nama</dt><dd className="font-semibold text-navy">{form.nama}</dd>
+                  <dt className="text-muted">WhatsApp</dt><dd className="font-semibold text-navy">{form.whatsapp}</dd>
+                  <dt className="text-muted">Keahlian</dt><dd className="font-semibold text-navy">{keahlianLabel}</dd>
+                  <dt className="text-muted">Domisili</dt><dd className="font-semibold text-navy">{form.domisili}</dd>
+                </dl>
+              </div>
+              <label htmlFor="setuju" className="flex gap-3 items-start bg-white border border-line rounded-[18px] p-4 cursor-pointer">
+                <input id="setuju" type="checkbox" checked={form.setuju} onChange={(e) => set('setuju', e.target.checked)} className="mt-0.5 w-5 h-5 accent-brand flex-shrink-0" />
+                <span className="text-sm leading-relaxed text-body">
+                  Saya mengerti bahwa pendaftaran ini adalah sebagai <strong className="text-navy">mitra mandiri</strong>,
+                  bersedia bekerja dengan sistem <strong className="text-navy">"No Work No Pay"</strong>, dan mengikuti standar
+                  operasional SinergiPro.
+                </span>
               </label>
-            </div>
-          </div>
+            </>
+          )}
 
           {error && (
-            <p role="alert" className="p-3 rounded-lg bg-red-50 text-red-700 text-sm font-medium">{error}</p>
+            <p role="alert" className="px-3.5 py-3 rounded-xl bg-red-50 text-red-700 text-sm font-medium">{error}</p>
           )}
+        </div>
 
-          <button
-            type="submit"
-            className="w-full py-4 font-black rounded-xl shadow-lg transition-all uppercase tracking-widest bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            Kirim Pendaftaran via WhatsApp
+        <div className="sticky bottom-0 px-5 pt-4 pb-6 bg-white border-t border-line">
+          <button type="submit" className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-base transition-colors">
+            {step === 0 && (needsSim ? 'Lanjut ke dokumen' : 'Lanjut')}
+            {step === 1 && 'Lanjut ke konfirmasi'}
+            {step === 2 && 'Kirim pendaftaran via WhatsApp'}
           </button>
-
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 };
